@@ -1,0 +1,39 @@
+{
+  "name": "agent-verification-gates",
+  "version": "0.1.0",
+  "description": "Zero-dependency verification gates for AI coding agents: deterministic finding ledger, anti-loop stall detection, scope growth budgets, read-only git tree integrity hashes, and UI evidence manifest checks.",
+  "type": "module",
+  "main": "./src/index.mjs",
+  "exports": {
+    ".": "./src/index.mjs",
+    "./finding-ledger": "./src/finding-ledger.mjs",
+    "./scope-budget": "./src/scope-budget.mjs",
+    "./tree-integrity": "./src/tree-integrity.mjs",
+    "./evidence-manifest": "./src/evidence-manifest.mjs"
+  },
+  "bin": {
+    "agent-gates": "./bin/agent-gates.mjs"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "demo": "node bin/agent-gates.mjs demo"
+  },
+  "keywords": [
+    "ai-agents",
+    "coding-agents",
+    "verification",
+    "guardrails",
+    "code-review",
+    "ci-gates",
+    "llm-eval",
+    "agent-safety"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alexandryasukaitisss-cmd/agent-verification-gates.git"
+  }
+}
