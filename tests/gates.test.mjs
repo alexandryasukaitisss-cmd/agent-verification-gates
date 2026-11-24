@@ -200,19 +200,30 @@ test("inspectEvidenceManifest validates real PNG screenshots, digests, scenarios
     assert.equal(bad.valid, false);
     assert.ok(bad.errors.length >= 3);
 
-    // Symlink escape attempt
+    // Symlink escape attempt (skipped on Windows environments without symlink privilege)
     const outsideDir = await mkdtemp(path.join(os.tmpdir(), "avg-outside-"));
     try {
       const outsidePng = path.join(outsideDir, "secret.png");
       await writeFile(outsidePng, png);
-      await symlink(outsidePng, path.join(dir, "shots/escaped.png"));
-      await writeFile(
-        path.join(dir, "symlink.json"),
-        JSON.stringify({ screenshots: [{ path: "shots/escaped.png", description: "Escaped" }] }),
-      );
-      const escaped = await inspectEvidenceManifest(dir, "symlink.json");
-      assert.equal(escaped.valid, false);
-      assert.ok(escaped.errors.some((e) => e.includes("symlink escapes")));
+      let symlinkCreated = true;
+      try {
+        await symlink(outsidePng, path.join(dir, "shots/escaped.png"));
+      } catch (err) {
+        if (err?.code === "EPERM" || err?.code === "EACCES") {
+          symlinkCreated = false;
+        } else {
+          throw err;
+        }
+      }
+      if (symlinkCreated) {
+        await writeFile(
+          path.join(dir, "symlink.json"),
+          JSON.stringify({ screenshots: [{ path: "shots/escaped.png", description: "Escaped" }] }),
+        );
+        const escaped = await inspectEvidenceManifest(dir, "symlink.json");
+        assert.equal(escaped.valid, false);
+        assert.ok(escaped.errors.some((e) => e.includes("symlink escapes")));
+      }
     } finally {
       await rm(outsideDir, { recursive: true, force: true });
     }
